@@ -1,0 +1,6 @@
+{
+  "name": "Nexus Web3 Portfolio",
+  "description": "Dashboard corporativo para administrar infraestructura de red, billeteras, y monitorear tareas en Web3.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
