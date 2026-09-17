@@ -31,8 +31,8 @@ object RetrofitClient {
     }
 
     // Local PM2 Backend Client
-    // We use 10.0.2.2 which maps to localhost on the host machine from the Android emulator
-    var localBackendUrl = "http://10.0.2.2:3000/"
+    // We use 127.0.0.1 which maps to localhost on the local device (Termux)
+    var localBackendUrl = "http://127.0.0.1:3000/"
 
     fun getProcessService(): ProcessControlService {
         return Retrofit.Builder()
