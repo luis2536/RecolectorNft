@@ -23,8 +23,8 @@ fun ProcessControllerScreen(viewModel: NexusViewModel) {
     val error by viewModel.processError.collectAsStateWithLifecycle()
 
     var showDialog by remember { mutableStateOf(false) }
-    var scriptPath by remember { mutableStateOf("") }
-    var processName by remember { mutableStateOf("") }
+    var scriptPath by remember { mutableStateOf("server.js") }
+    var processName by remember { mutableStateOf("nexus-bot-worker") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchProcessStatus()
@@ -36,27 +36,39 @@ fun ProcessControllerScreen(viewModel: NexusViewModel) {
                 onClick = { showDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Start Script", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Filled.Add, contentDescription = "Iniciar Tarea", tint = MaterialTheme.colorScheme.onPrimary)
             }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Background Task Runners", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Column {
+                    Text("Controlador Termux & PM2", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Gestión de bots y recolección 24/7 en segundo plano", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 IconButton(onClick = { viewModel.fetchProcessStatus() }) {
-                    Icon(Icons.Filled.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Filled.Refresh, contentDescription = "Actualizar", tint = MaterialTheme.colorScheme.primary)
                 }
             }
             
+            Spacer(modifier = Modifier.height(12.dp))
+
             if (error != null) {
-                Text(error!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 8.dp))
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                ) {
+                    Text(error!!, color = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.padding(12.dp), fontSize = 12.sp)
+                }
             }
 
             if (processes.isEmpty()) {
-                Text("No tasks running. (Make sure your PM2 backend is running!)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Text("No hay tareas PM2 activas. Asegúrate de ejecutar tu backend en Termux (http://127.0.0.1:3000).", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(processes) { process ->
                         Card(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -67,17 +79,17 @@ fun ProcessControllerScreen(viewModel: NexusViewModel) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                             ) {
-                                Column {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(process.name, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                                    Text("Status: ${process.status}", color = if (process.status == "online") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
-                                    Text("Mem: ${process.memory / 1024 / 1024} MB | CPU: ${process.cpu}%", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("Estado: ${process.status}", color = if (process.status == "online") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                                    Text("Memoria: ${process.memory / 1024 / 1024} MB | CPU: ${process.cpu}%", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                                 }
                                 Row {
                                     IconButton(onClick = { viewModel.controlProcess("restart", process.name) }) {
-                                        Icon(Icons.Filled.Refresh, contentDescription = "Restart", tint = MaterialTheme.colorScheme.secondary)
+                                        Icon(Icons.Filled.Refresh, contentDescription = "Reiniciar", tint = MaterialTheme.colorScheme.secondary)
                                     }
                                     IconButton(onClick = { viewModel.controlProcess("stop", process.name) }) {
-                                        Icon(Icons.Filled.Stop, contentDescription = "Stop", tint = MaterialTheme.colorScheme.error)
+                                        Icon(Icons.Filled.Stop, contentDescription = "Detener", tint = MaterialTheme.colorScheme.error)
                                     }
                                 }
                             }
@@ -91,24 +103,23 @@ fun ProcessControllerScreen(viewModel: NexusViewModel) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Start New PM2 Process") },
+            title = { Text("Iniciar Proceso en Termux") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(value = processName, onValueChange = { processName = it }, label = { Text("Process Name") })
-                    OutlinedTextField(value = scriptPath, onValueChange = { scriptPath = it }, label = { Text("Script Path (e.g. index.js)") })
+                    OutlinedTextField(value = processName, onValueChange = { processName = it }, label = { Text("Nombre del Proceso") })
+                    OutlinedTextField(value = scriptPath, onValueChange = { scriptPath = it }, label = { Text("Archivo Script (ej. server.js)") })
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.controlProcess("start", processName, scriptPath)
                     showDialog = false
-                    processName = ""; scriptPath = ""
                 }) {
-                    Text("Start")
+                    Text("Iniciar")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDialog = false }) { Text("Cancelar") }
             }
         )
     }

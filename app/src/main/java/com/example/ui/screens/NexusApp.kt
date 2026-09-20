@@ -6,7 +6,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.navigation.compose.*
 import com.example.ui.viewmodel.NexusViewModel
 
@@ -20,7 +19,7 @@ fun NexusApp(viewModel: NexusViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Nexus Web3 Portfolio") },
+                title = { Text(text = "Nexus Web3 - PlayNixies Automation") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -30,8 +29,8 @@ fun NexusApp(viewModel: NexusViewModel) {
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Dashboard, contentDescription = "Dashboard") },
-                    label = { Text("Dashboard") },
+                    icon = { Icon(Icons.Filled.Dashboard, contentDescription = "Panel") },
+                    label = { Text("Panel") },
                     selected = currentRoute == "dashboard",
                     onClick = { navController.navigate("dashboard") },
                     colors = NavigationBarItemDefaults.colors(
@@ -42,8 +41,8 @@ fun NexusApp(viewModel: NexusViewModel) {
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Security, contentDescription = "Identities") },
-                    label = { Text("Identities") },
+                    icon = { Icon(Icons.Filled.Group, contentDescription = "Cuentas") },
+                    label = { Text("Cuentas") },
                     selected = currentRoute == "identities",
                     onClick = { navController.navigate("identities") },
                     colors = NavigationBarItemDefaults.colors(
@@ -54,8 +53,20 @@ fun NexusApp(viewModel: NexusViewModel) {
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Terminal, contentDescription = "Processes") },
-                    label = { Text("Processes") },
+                    icon = { Icon(Icons.Filled.Public, contentDescription = "Navegador") },
+                    label = { Text("Navegador") },
+                    selected = currentRoute == "browser",
+                    onClick = { navController.navigate("browser") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Filled.Terminal, contentDescription = "Termux") },
+                    label = { Text("Termux") },
                     selected = currentRoute == "processes",
                     onClick = { navController.navigate("processes") },
                     colors = NavigationBarItemDefaults.colors(
@@ -66,8 +77,8 @@ fun NexusApp(viewModel: NexusViewModel) {
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Code, contentDescription = "Auditor") },
-                    label = { Text("Auditor") },
+                    icon = { Icon(Icons.Filled.SmartToy, contentDescription = "IA Anti-Baneo") },
+                    label = { Text("IA Bot") },
                     selected = currentRoute == "auditor",
                     onClick = { navController.navigate("auditor") },
                     colors = NavigationBarItemDefaults.colors(
@@ -87,6 +98,7 @@ fun NexusApp(viewModel: NexusViewModel) {
         ) {
             composable("dashboard") { DashboardScreen(viewModel) }
             composable("identities") { NodeIdentityScreen(viewModel) }
+            composable("browser") { BrowserBotScreen(viewModel) }
             composable("processes") { ProcessControllerScreen(viewModel) }
             composable("auditor") { SmartContractAuditorScreen(viewModel) }
         }
